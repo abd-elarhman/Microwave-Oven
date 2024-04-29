@@ -2,7 +2,7 @@
 
 
 <p align="center">
-  <img src="03-Docs/microwave_logo_01.jpg">
+  <img src="03-Docs/logo_02.jpg">
 </p>
 
 ---
