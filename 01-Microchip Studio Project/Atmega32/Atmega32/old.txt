@@ -1,0 +1,222 @@
+/*
+// BackGround Code
+SSD_void_display(SSD_ID_ONE,i%10);
+SSD_void_display(SSD_ID_TEN,i/10);
+i++;
+if (100==i)
+{
+	i=0;
+}
+_delay_ms(250);
+
+*/
+
+/*******************************************************************/
+/*
+transation=getTransation();
+		
+		switch (currentState)
+		{
+			case IDLE_OFF_STATE:
+				switch (transation)
+				{
+					case START_EVENT:
+					if (getFoodTransation()==FOOD_WEIGHT_VALID_EVENT)
+					{
+						isFoodWeightValid=STD_TRUE;
+					} 
+					else
+					{
+						isFoodWeightValid=STD_FALSE;
+						LCD_SetCursor(LCD_ID1,2,1);
+						LCD_WriteStr(LCD_ID1,(u8*)"                   ");
+						LCD_SetCursor(LCD_ID1,2,1);
+						LCD_WriteStr(LCD_ID1,(u8*)"FOOD_WEIGHT_INVALID");
+				
+					}
+					if (getTimeTransation()==TIME_ADJUSTED_EVENT)
+					{
+						isTimeAdjusted=STD_TRUE;
+					} 
+					else
+					{
+						isTimeAdjusted=STD_FALSE;
+						LCD_SetCursor(LCD_ID1,2,1);
+						LCD_WriteStr(LCD_ID1,(u8*)"                   ");
+						LCD_SetCursor(LCD_ID1,2,1);
+						LCD_WriteStr(LCD_ID1,(u8*)"TIME_NOT_ADJUSTED");
+					
+					}
+					if (isFoodWeightValid && isTimeAdjusted)
+					{
+						currentState=ON_STATE;
+						isTimeAdjusted=STD_FALSE;
+						isFoodWeightValid=STD_FALSE;
+					} 
+					else
+					{
+						
+					break;
+					
+// 					case:DOOR_OPENED_EVENT
+// 					//state
+// 					historyState_doorOpened=IDLE_OFF_STATE;
+// 					currentState=DOOR_OPENED_STATE;
+// 					break;
+// 					
+					case CANCEL_EVENT:
+					for (int i=0;i<8;i++)
+					{
+						LCD_voidSetOption(LCD_ID1,LCD_ClearDisplay);
+						LCD_SetCursor(LCD_ID1,2,1);
+						LCD_WriteStr(LCD_ID1,(u8*)"Reset...........");
+					}
+					currentState=IDLE_OFF_STATE;
+					break;
+					
+					default:
+					//display
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"                   ");
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"Now_Time_Setting");
+					
+					//state
+					currentState=IDLE_OFF_STATE;
+					
+					//system
+					Dio_WritePin(HEATER,DIO_VOLT_LOW);
+					Dio_WritePin(LAMP,DIO_VOLT_LOW);
+					Dio_WritePin(MOTOR,DIO_VOLT_LOW);		
+					break;
+					if (Dio_ReadPin(DOOR_SENSOR)==DIO_VOLT_HIGH)//opened
+					{
+						//while();
+						Dio_WritePin(HEATER,DIO_VOLT_LOW);
+						Dio_WritePin(LAMP,DIO_VOLT_LOW);
+						Dio_WritePin(MOTOR,DIO_VOLT_LOW);
+						historyState_doorOpened=IDLE_OFF_STATE;
+						currentState=DOOR_OPENED_STATE;
+					}
+				}
+			break;
+			
+			case ON_STATE:
+				switch (transation)
+				{
+					case START_EVENT:
+					currentState=ON_STATE;
+					break;
+					
+					case CANCEL_EVENT:
+					currentState=PAUSE_STATE;
+					//historyState_pause=ON_STATE;
+					break;
+// 					
+// 					case:DOOR_OPENED_EVENT
+// 					currentState=DOOR_OPENED_STATE;
+// 					historyState_doorOpened=ON_STATE;
+// 					break;
+				}
+				if (getFoodTransation()==FOOD_WEIGHT_VALID_EVENT)
+				{
+					//keep running
+					Dio_WritePin(HEATER,DIO_VOLT_HIGH);
+					Dio_WritePin(LAMP,DIO_VOLT_HIGH);
+					Dio_WritePin(MOTOR,DIO_VOLT_HIGH);
+					
+					
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"                   ");
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"Now_RUNNING.....");
+				} 
+				else
+				{
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"                   ");
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"FOOD_WEIGHT_INVALID");
+				}
+				if (Dio_ReadPin(DOOR_SENSOR)==DIO_VOLT_HIGH)//opened
+				{
+					//while();
+					Dio_WritePin(HEATER,DIO_VOLT_LOW);
+					Dio_WritePin(LAMP,DIO_VOLT_LOW);
+					Dio_WritePin(MOTOR,DIO_VOLT_LOW);
+					currentState=DOOR_OPENED_STATE;
+					historyState_doorOpened=ON_STATE;
+				}
+				
+			break;
+			
+			case DOOR_OPENED_STATE:
+				if (Dio_ReadPin(DOOR_SENSOR)==DIO_VOLT_LOW)//closed
+				{
+					//while();
+					currentState=historyState_doorOpened;
+				}
+				else
+				{
+					//display
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"                   ");
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"door opened");
+				}	
+			break;
+			
+			case PAUSE_STATE:
+				switch (transation)
+				{
+					case START_EVENT: 
+					currentState=ON_STATE;
+					break;
+					
+					case CANCEL_EVENT:
+					for (int i=0;i<8;i++)
+					{
+						LCD_voidSetOption(LCD_ID1,LCD_ClearDisplay);
+						LCD_SetCursor(LCD_ID1,2,1);
+						LCD_WriteStr(LCD_ID1,(u8*)"Reset...........");
+					}
+					currentState=IDLE_OFF_STATE;
+					break;
+// 					
+// 					case:DOOR_OPENED_EVENT
+// 					currentState=DOOR_OPENED_STATE;
+// 					historyState_doorOpened=PAUSE_STATE;
+// 					break;
+					
+					default:	
+					//display
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"                   ");
+					LCD_SetCursor(LCD_ID1,2,1);
+					LCD_WriteStr(LCD_ID1,(u8*)"Pause_state");
+					
+					//system
+					Dio_WritePin(HEATER,DIO_VOLT_LOW);
+					Dio_WritePin(LAMP,DIO_VOLT_LOW);
+					Dio_WritePin(MOTOR,DIO_VOLT_LOW);
+					
+					if (Dio_ReadPin(DOOR_SENSOR)==DIO_VOLT_HIGH)//opened
+					{
+						//while();
+						Dio_WritePin(HEATER,DIO_VOLT_LOW);
+						Dio_WritePin(LAMP,DIO_VOLT_LOW);
+						Dio_WritePin(MOTOR,DIO_VOLT_LOW);
+						currentState=DOOR_OPENED_STATE;
+						historyState_doorOpened=PAUSE_STATE;
+					}
+					break;
+				}
+			
+			break;
+		}
+		
+		
+	}//while(1) Super_Loop
+}//main
+*/
+/**********************************************************************************************/
